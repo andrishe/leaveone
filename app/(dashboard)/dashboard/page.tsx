@@ -67,7 +67,12 @@ export default async function DashboardPage() {
     },
   });
 
-  const calendarLeaves: CalendarLeaveDTO[] = approvedLeaves.map((leave) => ({
+  const calendarLeaves: CalendarLeaveDTO[] = approvedLeaves.map((leave: {
+    id: string;
+    startDate: Date;
+    endDate: Date;
+    leaveType?: { id?: string; name?: string; color?: string };
+  }) => ({
     id: leave.id,
     startDate: leave.startDate.toISOString(),
     endDate: leave.endDate.toISOString(),
@@ -76,7 +81,9 @@ export default async function DashboardPage() {
   }));
 
   const typeLegend = new Map<string, CalendarLegendItem>();
-  approvedLeaves.forEach((leave) => {
+  approvedLeaves.forEach((leave: {
+    leaveType?: { id?: string; name?: string; color?: string };
+  }) => {
     const typeId = leave.leaveType?.id;
     if (!typeId || typeLegend.has(typeId)) {
       return;
