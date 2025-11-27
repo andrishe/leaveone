@@ -29,7 +29,7 @@ export default async function DashboardPage() {
   });
 
   const totalRemaining = balances.reduce(
-    (sum: number, b) => sum + b.remaining,
+    (sum: number, b: { remaining: number }) => sum + b.remaining,
     0
   );
 
