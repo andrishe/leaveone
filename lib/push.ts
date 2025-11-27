@@ -1,4 +1,5 @@
 import webpush from 'web-push';
+import { db } from '@/lib/db';
 
 webpush.setVapidDetails(
   'mailto:contact@leaveone.com',

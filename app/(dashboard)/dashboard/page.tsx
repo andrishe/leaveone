@@ -28,7 +28,10 @@ export default async function DashboardPage() {
     include: { leaveType: true },
   });
 
-  const totalRemaining = balances.reduce((sum, b) => sum + b.remaining, 0);
+  const totalRemaining = balances.reduce(
+    (sum: number, b) => sum + b.remaining,
+    0
+  );
 
   const pendingCount = await db.leave.count({
     where:
