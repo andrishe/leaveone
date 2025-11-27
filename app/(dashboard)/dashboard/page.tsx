@@ -46,7 +46,10 @@ export default async function DashboardPage() {
           },
   });
 
-  const usedThisYear = balances.reduce((sum, b) => sum + b.used, 0);
+  const usedThisYear = balances.reduce(
+    (sum: number, b: { used: number }) => sum + b.used,
+    0
+  );
 
   const approvedLeaves = await db.leave.findMany({
     where: {
