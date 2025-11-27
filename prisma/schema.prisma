@@ -1,0 +1,260 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===== COMPANIES =====
+
+model Company {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  plan        Plan     @default(TRIAL)
+  contactEmail String?
+  contactPhone String?
+  address     String?  @db.Text
+  notificationNewRequestEmail Boolean @default(true)
+  notificationPendingReminder Boolean @default(true)
+  notificationPush Boolean @default(false)
+  defaultTheme String @default("system")
+  trialEndsAt DateTime?
+  stripeCustomerId String? @unique
+  stripeSubscriptionId String? @unique
+  workingDays Int[]    @default([1, 2, 3, 4, 5])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  users       User[]
+  leaves      Leave[]
+  leaveTypes  LeaveType[]
+  policies    LeavePolicy[]
+  
+  @@map("companies")
+}
+
+enum Plan {
+  TRIAL
+  STARTER
+  BUSINESS
+  ENTERPRISE
+}
+
+// ===== USERS =====
+
+model User {
+  id          String   @id @default(cuid())
+  companyId   String
+  email       String   @unique
+  passwordHash String
+  name        String
+  role        Role     @default(EMPLOYEE)
+  managerId   String?
+  avatarUrl   String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  manager     User?    @relation("ManagerEmployee", fields: [managerId], references: [id])
+  subordinates User[]  @relation("ManagerEmployee")
+  
+  leaves      Leave[]  @relation("UserLeaves")
+  approvedLeaves Leave[] @relation("ApprovedBy")
+  balances    LeaveBalance[]
+  
+  // Better Auth relations
+  sessions    Session[]
+  accounts    Account[]
+  
+  @@index([companyId])
+  @@index([managerId])
+  @@index([email])
+  @@map("users")
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  EMPLOYEE
+}
+
+// ===== LEAVE TYPES =====
+
+model LeaveType {
+  id          String   @id @default(cuid())
+  companyId   String
+  name        String
+  code        String
+  color       String   @default("#3b82f6")
+  icon        String   @default("🏖️")
+  maxDaysPerYear Float
+  requiresApproval Boolean @default(true)
+  requiresDocument Boolean @default(false)
+  carryOverAllowed Boolean @default(false)
+  carryOverMaxDays Float   @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  leaves      Leave[]
+  balances    LeaveBalance[]
+  
+  @@unique([companyId, code])
+  @@index([companyId])
+  @@map("leave_types")
+}
+
+model LeavePolicy {
+  id                String   @id @default(cuid())
+  companyId         String
+  name              String
+  description       String?  @db.Text
+  requiresDocument  Boolean  @default(false)
+  maxConsecutiveDays Float?
+  blackoutDates     DateTime[] @default([])
+  autoApprovalThreshold Float?
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  company           Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@map("leave_policies")
+}
+
+// ===== LEAVE BALANCES =====
+
+model LeaveBalance {
+  id          String   @id @default(cuid())
+  userId      String
+  leaveTypeId String
+  year        Int
+  allocated   Float
+  used        Float    @default(0)
+  pending     Float    @default(0)
+  remaining   Float
+  carryOver   Float    @default(0)
+  updatedAt   DateTime @updatedAt
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  leaveType   LeaveType @relation(fields: [leaveTypeId], references: [id])
+  
+  @@unique([userId, leaveTypeId, year])
+  @@index([userId])
+  @@map("leave_balances")
+}
+
+// ===== LEAVES =====
+
+model Leave {
+  id          String      @id @default(cuid())
+  companyId   String
+  userId      String
+  leaveTypeId String
+  startDate   DateTime
+  endDate     DateTime
+  halfDayStart Boolean    @default(false)
+  halfDayEnd  Boolean    @default(false)
+  totalDays   Float
+  status      LeaveStatus @default(PENDING)
+  comment     String?     @db.Text
+  documentUrl String?
+  approvedBy  String?
+  approvedAt  DateTime?
+  rejectedReason String?  @db.Text
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  company     Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user        User      @relation("UserLeaves", fields: [userId], references: [id], onDelete: Cascade)
+  leaveType   LeaveType @relation(fields: [leaveTypeId], references: [id])
+  approver    User?     @relation("ApprovedBy", fields: [approvedBy], references: [id])
+  
+  @@index([companyId])
+  @@index([userId])
+  @@index([status])
+  @@index([startDate, endDate])
+  @@map("leaves")
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+// ===== AUDIT LOG =====
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  companyId   String
+  userId      String?
+  action      String
+  entityType  String
+  entityId    String
+  metadata    Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+  
+  @@index([companyId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ===== BETTER AUTH TABLES =====
+
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  accountId         String
+  providerId        String
+  userId            String
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken       String?  @db.Text
+  refreshToken      String?  @db.Text
+  idToken           String?  @db.Text
+  accessTokenExpiresAt DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope             String?
+  password          String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([identifier, value])
+  @@map("verifications")
+}

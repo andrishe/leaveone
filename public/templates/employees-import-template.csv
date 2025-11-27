@@ -1,0 +1,5 @@
+email,prenom,nom,statut,role,managerEmail
+jean.dupont@exemple.com,Jean,Dupont,ACTIF,ADMIN,
+marie.durand@exemple.com,Marie,Durand,ACTIF,MANAGER,jean.dupont@exemple.com
+pierre.martin@exemple.com,Pierre,Martin,ACTIF,EMPLOYEE,marie.durand@exemple.com
+lea.leroy@exemple.com,Lea,Leroy,INACTIF,EMPLOYEE,marie.durand@exemple.com
