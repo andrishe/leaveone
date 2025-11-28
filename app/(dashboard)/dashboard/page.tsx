@@ -67,33 +67,35 @@ export default async function DashboardPage() {
     },
   });
 
-  const calendarLeaves: CalendarLeaveDTO[] = approvedLeaves.map((leave: {
-    id: string;
-    startDate: Date;
-    endDate: Date;
-    leaveType?: { id?: string; name?: string; color?: string };
-  }) => ({
-    id: leave.id,
-    startDate: leave.startDate.toISOString(),
-    endDate: leave.endDate.toISOString(),
-    color: leave.leaveType?.color ?? '#22c55e',
-    label: `${leave.leaveType?.name ?? 'Congé'} · ${leave.startDate.toLocaleDateString('fr-FR')}`,
-  }));
+  const calendarLeaves: CalendarLeaveDTO[] = approvedLeaves.map(
+    (leave: {
+      id: string;
+      startDate: Date;
+      endDate: Date;
+      leaveType?: { id?: string; name?: string; color?: string };
+    }) => ({
+      id: leave.id,
+      startDate: leave.startDate.toISOString(),
+      endDate: leave.endDate.toISOString(),
+      color: leave.leaveType?.color ?? '#22c55e',
+      label: `${leave.leaveType?.name ?? 'Congé'} · ${leave.startDate.toLocaleDateString('fr-FR')}`,
+    })
+  );
 
   const typeLegend = new Map<string, CalendarLegendItem>();
-  approvedLeaves.forEach((leave: {
-    leaveType?: { id?: string; name?: string; color?: string };
-  }) => {
-    const typeId = leave.leaveType?.id;
-    if (!typeId || typeLegend.has(typeId)) {
-      return;
-    }
+  approvedLeaves.forEach(
+    (leave: { leaveType?: { id?: string; name?: string; color?: string } }) => {
+      const typeId = leave.leaveType?.id;
+      if (!typeId || typeLegend.has(typeId)) {
+        return;
+      }
 
-    typeLegend.set(typeId, {
-      color: leave.leaveType?.color ?? '#22c55e',
-      label: leave.leaveType?.name ?? 'Congé',
-    });
-  });
+      typeLegend.set(typeId, {
+        color: leave.leaveType?.color ?? '#22c55e',
+        label: leave.leaveType?.name ?? 'Congé',
+      });
+    }
+  );
 
   const calendarLegend: CalendarLegendItem[] = [
     { label: "Aujourd'hui", color: '#3b82f6' },
