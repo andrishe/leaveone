@@ -40,18 +40,29 @@ export async function TeamRequests({
     },
   });
 
-  const mapped: TeamRequestItem[] = requests.map((request) => ({
-    id: request.id,
-    employeeName: request.user?.name ?? 'Employé inconnu',
-    employeeEmail: request.user?.email ?? '',
-    leaveTypeName: request.leaveType.name,
-    leaveTypeColor: request.leaveType.color,
-    startDate: request.startDate.toISOString(),
-    endDate: request.endDate.toISOString(),
-    totalDays: request.totalDays,
-    createdAt: request.createdAt.toISOString(),
-    comment: request.comment ?? null,
-  }));
+  const mapped: TeamRequestItem[] = requests.map(
+    (request: {
+      id: string;
+      user?: { id: string; name?: string; email?: string };
+      leaveType: { name: string; color: string };
+      startDate: Date;
+      endDate: Date;
+      totalDays: number;
+      createdAt: Date;
+      comment?: string | null;
+    }) => ({
+      id: request.id,
+      employeeName: request.user?.name ?? 'Employé inconnu',
+      employeeEmail: request.user?.email ?? '',
+      leaveTypeName: request.leaveType.name,
+      leaveTypeColor: request.leaveType.color,
+      startDate: request.startDate.toISOString(),
+      endDate: request.endDate.toISOString(),
+      totalDays: request.totalDays,
+      createdAt: request.createdAt.toISOString(),
+      comment: request.comment ?? null,
+    })
+  );
 
   return <TeamRequestsClient initialRequests={mapped} isAdmin={isAdmin} />;
 }
