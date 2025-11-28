@@ -31,7 +31,10 @@ export async function GET(request: NextRequest) {
     });
 
     // Somme des jours pris
-    const daysTaken = leaves.reduce((sum, l) => sum + (l.totalDays ?? 0), 0);
+    const daysTaken = leaves.reduce(
+      (sum: number, l: { totalDays?: number }) => sum + (l.totalDays ?? 0),
+      0
+    );
 
     // Récupère le quota annuel (exemple : 25 jours, à adapter selon ta logique)
     const leaveType = await db.leaveType.findFirst({
