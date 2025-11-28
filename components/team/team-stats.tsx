@@ -1,3 +1,4 @@
+// import { Role } from '@prisma/client';
 import { Users, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { Role } from '@prisma/client';
 import { db } from '@/lib/db';
@@ -8,7 +9,7 @@ interface TeamStatsProps {
 }
 
 export async function TeamStats({ companyId, managerId }: TeamStatsProps) {
-  const nonAdminRoles: Role[] = [Role.EMPLOYEE, Role.MANAGER];
+  const nonAdminRoles: Array<'EMPLOYEE' | 'MANAGER'> = ['EMPLOYEE', 'MANAGER'];
   const userScope = managerId
     ? { companyId, managerId }
     : { companyId, role: { in: nonAdminRoles } };
