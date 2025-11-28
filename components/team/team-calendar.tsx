@@ -38,21 +38,31 @@ export async function TeamCalendar({
     },
   });
 
+  type Leave = {
+    id: string;
+    startDate: Date;
+    endDate: Date;
+    user?: { name?: string };
+    leaveType?: { id?: string; name?: string; color?: string };
+  };
+
   const upcomingAbsences = approvedLeaves
-    .filter((leave) => leave.endDate >= now)
-    .sort((a, b) => a.startDate.getTime() - b.startDate.getTime())
+    .filter((leave: Leave) => leave.endDate >= now)
+    .sort((a: Leave, b: Leave) => a.startDate.getTime() - b.startDate.getTime())
     .slice(0, 8);
 
-  const calendarLeaves: CalendarLeaveDTO[] = approvedLeaves.map((leave) => ({
-    id: leave.id,
-    startDate: leave.startDate.toISOString(),
-    endDate: leave.endDate.toISOString(),
-    color: leave.leaveType?.color ?? '#22c55e',
-    label: `${leave.user?.name ?? 'Employé'} · ${leave.leaveType?.name ?? 'Congé'}`,
-  }));
+  const calendarLeaves: CalendarLeaveDTO[] = approvedLeaves.map(
+    (leave: Leave) => ({
+      id: leave.id,
+      startDate: leave.startDate.toISOString(),
+      endDate: leave.endDate.toISOString(),
+      color: leave.leaveType?.color ?? '#22c55e',
+      label: `${leave.user?.name ?? 'Employé'} · ${leave.leaveType?.name ?? 'Congé'}`,
+    })
+  );
 
   const typeLegend = new Map<string, CalendarLegendItem>();
-  approvedLeaves.forEach((leave) => {
+  approvedLeaves.forEach((leave: Leave) => {
     const typeId = leave.leaveType?.id;
 
     if (!typeId || typeLegend.has(typeId)) {
