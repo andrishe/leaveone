@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Prisma } from '@prisma/client';
+// import { Prisma } from '@prisma/client';
 import { db } from '@/lib/db';
 import { getAuthenticatedContext } from '@/lib/auth-helpers';
 import { parsePolicyPayload } from '../route';
@@ -147,9 +147,12 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    // Si tu veux gérer l'erreur P2025, tu peux faire :
     if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === 'P2025'
+      typeof error === 'object' &&
+      error &&
+      'code' in error &&
+      (error as any).code === 'P2025'
     ) {
       return NextResponse.json(
         { error: 'Politique introuvable ou déjà supprimée' },
