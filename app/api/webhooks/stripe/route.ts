@@ -2,7 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import type Stripe from 'stripe';
 import { stripe } from '@/lib/stripe';
 import { db } from '@/lib/db';
-import { Plan } from '@prisma/client';
+// Define Plan enum if not imported from Prisma
+const Plan = new Map([
+  ['TRIAL', 'TRIAL'],
+  ['STARTER', 'STARTER'],
+  ['BUSINESS', 'BUSINESS'],
+  ['ENTERPRISE', 'ENTERPRISE'],
+]);
+// import { Plan } from '@prisma/client';
 
 export async function POST(request: NextRequest) {
   const signature = request.headers.get('stripe-signature');
@@ -34,11 +41,14 @@ export async function POST(request: NextRequest) {
       const metadata = session.metadata ?? {};
       const companyId = metadata.companyId;
       const maybePlan = metadata.plan as string | undefined;
-      const allowedPlans = new Set<Plan>(Object.values(Plan));
+      const allowedPlans = new Set([
+        'TRIAL',
+        'STARTER',
+        'BUSINESS',
+        'ENTERPRISE',
+      ]);
       const plan =
-        maybePlan && allowedPlans.has(maybePlan as Plan)
-          ? (maybePlan as Plan)
-          : undefined;
+        maybePlan && allowedPlans.has(maybePlan) ? maybePlan : undefined;
       const subscriptionId =
         typeof session.subscription === 'string'
           ? session.subscription
@@ -52,7 +62,7 @@ export async function POST(request: NextRequest) {
       await db.company.update({
         where: { id: companyId },
         data: {
-          plan,
+          plan: plan as any,
           stripeSubscriptionId: subscriptionId,
           trialEndsAt: null,
         },
@@ -66,7 +76,7 @@ export async function POST(request: NextRequest) {
 
       await db.company.update({
         where: { stripeSubscriptionId: subscription.id },
-        data: { plan: Plan.TRIAL, stripeSubscriptionId: null },
+        data: { plan: 'TRIAL', stripeSubscriptionId: null },
       });
 
       break;
