@@ -108,15 +108,6 @@ export function Sidebar() {
         </div>
       </nav>
 
-      {/* Solde Congés Card */}
-      <div className="p-4">
-        <div className="rounded-xl bg-linear-to-br from-blue-600 via-indigo-500 to-cyan-500 p-4 text-white shadow-lg">
-          <p className="text-sm font-semibold mb-1">Solde disponible</p>
-          <p className="text-3xl font-bold mb-1">{remainingDays}</p>
-          <p className="text-xs text-blue-100">jours de congés restants</p>
-        </div>
-      </div>
-
       {/* Logout */}
       <div className="p-4 border-t border-blue-100/60 dark:border-slate-700/60">
         <button
