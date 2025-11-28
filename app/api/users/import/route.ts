@@ -205,7 +205,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const existingUsers = await db.user.findMany({
+    const existingUsers: { email: string }[] = await db.user.findMany({
       where: {
         companyId: sessionUser.companyId,
         email: { in: parsedRows.map((row) => row.email) },
