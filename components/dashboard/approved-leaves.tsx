@@ -36,13 +36,24 @@ export async function ApprovedLeaves({ companyId }: ApprovedLeavesProps) {
   });
 
   // Séparer les congés en cours, à venir et passés
+  type Leave = {
+    id: string;
+    startDate: Date;
+    endDate: Date;
+    totalDays: number;
+    user: { name: string; email: string };
+    leaveType?: { name: string; color: string };
+  };
+
   const currentLeaves = approvedLeaves.filter(
-    (leave) => leave.startDate <= today && leave.endDate >= today
+    (leave: Leave) => leave.startDate <= today && leave.endDate >= today
   );
   const upcomingLeaves = approvedLeaves.filter(
-    (leave) => leave.startDate > today
+    (leave: Leave) => leave.startDate > today
   );
-  const pastLeaves = approvedLeaves.filter((leave) => leave.endDate < today);
+  const pastLeaves = approvedLeaves.filter(
+    (leave: Leave) => leave.endDate < today
+  );
 
   const formatDateRange = (start: Date, end: Date) => {
     const startStr = start.toLocaleDateString('fr-FR', {
@@ -88,7 +99,7 @@ export async function ApprovedLeaves({ companyId }: ApprovedLeavesProps) {
                 En cours
               </h3>
               <div className="space-y-2">
-                {currentLeaves.map((leave) => (
+                {currentLeaves.map((leave: Leave) => (
                   <div
                     key={leave.id}
                     className="flex items-center justify-between p-3 rounded-lg bg-green-50/50 dark:bg-green-900/10 border border-green-100 dark:border-green-800/30"
@@ -131,7 +142,7 @@ export async function ApprovedLeaves({ companyId }: ApprovedLeavesProps) {
                 À venir
               </h3>
               <div className="space-y-2">
-                {upcomingLeaves.map((leave) => (
+                {upcomingLeaves.map((leave: Leave) => (
                   <div
                     key={leave.id}
                     className="flex items-center justify-between p-3 rounded-lg bg-slate-50/50 dark:bg-slate-800/30 border border-slate-100 dark:border-slate-700/30"
@@ -179,7 +190,7 @@ export async function ApprovedLeaves({ companyId }: ApprovedLeavesProps) {
                 Historique
               </h3>
               <div className="space-y-2">
-                {pastLeaves.map((leave) => (
+                {pastLeaves.map((leave: Leave) => (
                   <div
                     key={leave.id}
                     className="flex items-center justify-between p-3 rounded-lg bg-slate-100/50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-700/30"
