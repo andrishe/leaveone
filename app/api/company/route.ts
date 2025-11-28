@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Plan } from '@prisma/client';
+// import { Plan } from '@prisma/client';
 import { db } from '@/lib/db';
 import { getAuthenticatedContext } from '@/lib/auth-helpers';
 
-const allowedPlans = new Set(Object.values(Plan));
+const allowedPlans = new Set(['TRIAL', 'STARTER', 'BUSINESS', 'ENTERPRISE']);
 const allowedThemes = new Set(['light', 'dark', 'system']);
 
 const companySelect = {
@@ -117,13 +117,13 @@ export async function PUT(request: NextRequest) {
     }
 
     if (typeof plan === 'string') {
-      if (!allowedPlans.has(plan as Plan)) {
+      if (!allowedPlans.has(plan)) {
         return NextResponse.json(
           { error: "Plan d'abonnement invalide" },
           { status: 400 }
         );
       }
-      updates.plan = plan as Plan;
+      updates.plan = plan;
     }
 
     if (Array.isArray(workingDays)) {
