@@ -123,56 +123,65 @@ export async function PendingRequests({
               </tr>
             </thead>
             <tbody>
-              {requests.map((request) => (
-                <tr
-                  key={request.id}
-                  className="border-b border-blue-100/40 dark:border-slate-800/40"
-                >
-                  <td className="py-4">
-                    {userRole === 'MANAGER' ? (
-                      <div className="flex items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-linear-to-br from-blue-600 via-indigo-500 to-cyan-500 text-xs font-semibold text-white shadow-sm">
-                          {request.user.name
-                            .split(' ')
-                            .map((n) => n[0])
-                            .join('')}
-                        </div>
-                        <span className="text-sm font-medium text-slate-900 dark:text-white">
-                          {request.user.name}
-                        </span>
-                      </div>
-                    ) : (
-                      <span className="inline-flex items-center rounded-full bg-blue-100/80 px-2.5 py-1 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-                        {request.leaveType.name}
-                      </span>
-                    )}
-                  </td>
-                  <td className="py-4 text-sm text-slate-600 dark:text-slate-400">
-                    {new Date(request.startDate).toLocaleDateString('fr-FR')} -{' '}
-                    {new Date(request.endDate).toLocaleDateString('fr-FR')}
-                  </td>
-                  <td className="py-4 text-sm font-medium text-slate-900 dark:text-white">
-                    {request.totalDays}j
-                  </td>
-                  <td className="py-4">
-                    <span className="inline-flex items-center rounded-full bg-yellow-100/80 px-2.5 py-1 text-xs font-medium text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">
-                      En attente
-                    </span>
-                  </td>
-                  {userRole === 'MANAGER' && (
+              {requests.map(
+                (request: {
+                  id: string;
+                  startDate: Date | string;
+                  endDate: Date | string;
+                  totalDays: number;
+                  user: { name: string; email: string };
+                  leaveType: { name: string };
+                }) => (
+                  <tr
+                    key={request.id}
+                    className="border-b border-blue-100/40 dark:border-slate-800/40"
+                  >
                     <td className="py-4">
-                      <div className="flex items-center gap-2">
-                        <button className="rounded bg-linear-to-br from-emerald-500 to-teal-500 p-1.5 text-white transition hover:brightness-110">
-                          <Check className="w-4 h-4" />
-                        </button>
-                        <button className="rounded bg-linear-to-br from-rose-500 to-red-500 p-1.5 text-white transition hover:brightness-110">
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
+                      {userRole === 'MANAGER' ? (
+                        <div className="flex items-center gap-2">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-linear-to-br from-blue-600 via-indigo-500 to-cyan-500 text-xs font-semibold text-white shadow-sm">
+                            {request.user.name
+                              .split(' ')
+                              .map((n) => n[0])
+                              .join('')}
+                          </div>
+                          <span className="text-sm font-medium text-slate-900 dark:text-white">
+                            {request.user.name}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="inline-flex items-center rounded-full bg-blue-100/80 px-2.5 py-1 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                          {request.leaveType.name}
+                        </span>
+                      )}
                     </td>
-                  )}
-                </tr>
-              ))}
+                    <td className="py-4 text-sm text-slate-600 dark:text-slate-400">
+                      {new Date(request.startDate).toLocaleDateString('fr-FR')}{' '}
+                      - {new Date(request.endDate).toLocaleDateString('fr-FR')}
+                    </td>
+                    <td className="py-4 text-sm font-medium text-slate-900 dark:text-white">
+                      {request.totalDays}j
+                    </td>
+                    <td className="py-4">
+                      <span className="inline-flex items-center rounded-full bg-yellow-100/80 px-2.5 py-1 text-xs font-medium text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">
+                        En attente
+                      </span>
+                    </td>
+                    {userRole === 'MANAGER' && (
+                      <td className="py-4">
+                        <div className="flex items-center gap-2">
+                          <button className="rounded bg-linear-to-br from-emerald-500 to-teal-500 p-1.5 text-white transition hover:brightness-110">
+                            <Check className="w-4 h-4" />
+                          </button>
+                          <button className="rounded bg-linear-to-br from-rose-500 to-red-500 p-1.5 text-white transition hover:brightness-110">
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    )}
+                  </tr>
+                )
+              )}
             </tbody>
           </table>
         </div>
