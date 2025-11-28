@@ -1,6 +1,5 @@
 // import { Role } from '@prisma/client';
 import { Users, Clock, CheckCircle, XCircle } from 'lucide-react';
-import { Role } from '@prisma/client';
 import { db } from '@/lib/db';
 
 interface TeamStatsProps {
