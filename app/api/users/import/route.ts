@@ -213,7 +213,9 @@ export async function POST(request: NextRequest) {
       select: { email: true },
     });
 
-    const existingEmails = new Set(existingUsers.map((user) => user.email));
+    const existingEmails = new Set(
+      existingUsers.map((user: { email: string }) => user.email)
+    );
 
     const validRows: ParsedRow[] = [];
 
