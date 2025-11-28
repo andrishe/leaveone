@@ -90,7 +90,7 @@ export async function TeamCalendar({
         </h3>
         <div className="space-y-3">
           {upcomingAbsences.length ? (
-            upcomingAbsences.map((absence) => (
+            upcomingAbsences.map((absence: Leave) => (
               <div
                 key={absence.id}
                 className="flex items-center gap-3 rounded-lg border border-slate-200 p-3 dark:border-slate-700"
