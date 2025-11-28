@@ -247,7 +247,7 @@ export async function POST(request: NextRequest) {
         select: { id: true, email: true },
       });
 
-      managers.forEach((manager) => {
+      managers.forEach((manager: { id: string; email: string }) => {
         managerMap.set(manager.email.toLowerCase(), manager.id);
       });
     }
