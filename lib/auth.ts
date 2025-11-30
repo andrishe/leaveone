@@ -27,7 +27,13 @@ export const auth = betterAuth({
       },
     },
   },
-  trustedOrigins: ['http://localhost:3000'],
+  trustedOrigins:
+    process.env.NODE_ENV === 'production'
+      ? [process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000']
+      : ['http://localhost:3000'],
+  advanced: {
+    generateId: false, // Laisse Prisma gérer les IDs
+  },
 });
 
 export type Session = typeof auth.$Infer.Session;

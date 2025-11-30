@@ -5,27 +5,9 @@ import { getAuthenticatedContext } from '@/lib/auth-helpers';
 // GET /api/leave-types
 export async function GET(request: NextRequest) {
   try {
-    const authContext = await getAuthenticatedContext(request);
-
-    if (!authContext) {
-      return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
-    }
-
-    const { user } = authContext;
-
-    const leaveTypes = await db.leaveType.findMany({
-      where: {
-        companyId: user.companyId,
-        isActive: true,
-      },
-      orderBy: {
-        name: 'asc',
-      },
-    });
-
+    const leaveTypes = await db.leaveType.findMany();
     return NextResponse.json(leaveTypes);
   } catch (error) {
-    console.error('GET /api/leave-types error:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

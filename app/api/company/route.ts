@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-// import { Plan } from '@prisma/client';
 import { db } from '@/lib/db';
 import { getAuthenticatedContext } from '@/lib/auth-helpers';
 
@@ -32,7 +31,7 @@ export async function GET(request: NextRequest) {
 
     const { user } = authContext;
 
-    const company = await db.company.findUnique({
+    const company = await db.company.findFirst({
       where: { id: user.companyId },
       select: companySelect,
     });
