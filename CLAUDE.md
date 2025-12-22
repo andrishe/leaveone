@@ -81,25 +81,26 @@ Frontend & Backend : Next.js (App Router)
 
 Langage : TypeScript (full-stack)
 
+UI : shadcn/ui (Radix UI + Tailwind CSS v4)
+
 ORM : Prisma
 
 Base de données : PostgreSQL
 
-Hébergement DB : Neon 
+Hébergement DB : Neon
 
-Auth : BetterAuth 
+Auth : BetterAuth
 
 Déploiement : Vercel
 
 Architecture globale
 Utilisateur (navigateur)
-        ↓
+↓
 Next.js (UI + API Routes)
-        ↓
+↓
 Prisma ORM
-        ↓
-PostgreSQL (Neon / Supabase)
-
+↓
+PostgreSQL (Neon )
 
 ➡️ Architecture monolithique full-stack, adaptée à un développeur solo, facile à maintenir et à faire évoluer.
 
