@@ -47,6 +47,8 @@ export async function getAuthenticatedContext(request: NextRequest) {
     where: { id: session.user.id },
     select: {
       id: true,
+      name: true,
+      email: true,
       companyId: true,
       role: true,
       isActive: true,

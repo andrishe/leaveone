@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export type CalendarLegendItem = {
   label: string;
@@ -126,34 +127,49 @@ export function CalendarMonth({
   };
 
   return (
-    <div className={containerClassName}>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className={containerClassName}
+    >
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
           {title}
         </h3>
         <div className="flex items-center gap-2">
-          <button
+          <motion.button
             type="button"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
             onClick={handlePrevMonth}
-            className="rounded p-1 transition hover:bg-blue-50/70 dark:hover:bg-slate-900/60"
+            className="rounded-lg p-1.5 transition hover:bg-blue-100/70 dark:hover:bg-slate-800/60"
             aria-label="Mois précédent"
           >
             <ChevronLeft className="h-4 w-4" />
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             type="button"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
             onClick={handleNextMonth}
-            className="rounded p-1 transition hover:bg-blue-50/70 dark:hover:bg-slate-900/60"
+            className="rounded-lg p-1.5 transition hover:bg-blue-100/70 dark:hover:bg-slate-800/60"
             aria-label="Mois suivant"
           >
             <ChevronRight className="h-4 w-4" />
-          </button>
+          </motion.button>
         </div>
       </div>
 
-      <p className="mb-4 text-base font-bold text-slate-900 dark:text-white">
+      <motion.p
+        key={`${year}-${month}`}
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.3 }}
+        className="mb-4 text-base font-bold bg-linear-to-r from-slate-900 via-blue-900 to-indigo-900 bg-clip-text text-transparent dark:from-white dark:via-blue-100 dark:to-indigo-100"
+      >
         {monthNames[month]} {year}
-      </p>
+      </motion.p>
 
       <div className="grid grid-cols-7 gap-1">
         {weekdayHeaders.map((day, index) => (
@@ -169,7 +185,7 @@ export function CalendarMonth({
           <div key={`empty-${index}`} />
         ))}
 
-        {days.map((day) => {
+        {days.map((day, dayIndex) => {
           const currentDay = new Date(year, month, day);
           const key = formatKey(currentDay);
           const entries = leaveMap.get(key) ?? [];
@@ -179,30 +195,73 @@ export function CalendarMonth({
             .map((entry) => entry.label ?? 'Congé approuvé')
             .join('\n');
 
-          const baseClasses =
-            'relative flex aspect-square items-center justify-center rounded-lg text-sm transition';
+          // Get the primary leave color (first entry)
+          const primaryLeaveColor = entries[0]?.color ?? defaultLeaveColor;
 
-          const stateClasses = isToday
-            ? 'bg-linear-to-br from-blue-600 via-indigo-500 to-cyan-500 font-semibold text-white'
-            : hasLeaves
-              ? 'bg-emerald-100/80 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
-              : 'text-slate-700 hover:bg-blue-50/70 dark:text-slate-300 dark:hover:bg-slate-900/60';
+          const baseClasses =
+            'relative flex aspect-square items-center justify-center rounded-lg text-sm font-medium transition-all duration-200 overflow-hidden';
+
+          // Use the leave type color for the background
+          const getBackgroundStyle = () => {
+            if (isToday) {
+              return 'bg-linear-to-br from-blue-600 via-indigo-500 to-cyan-500 text-white shadow-md';
+            }
+            if (hasLeaves) {
+              // Use semi-transparent version of the leave color
+              const rgb = primaryLeaveColor.match(/\w\w/g)?.map((x) => parseInt(x, 16));
+              if (rgb) {
+                return `text-slate-900 dark:text-white`;
+              }
+              return 'bg-emerald-100/80 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300';
+            }
+            return 'text-slate-700 hover:bg-blue-50/70 dark:text-slate-300 dark:hover:bg-slate-900/60';
+          };
+
+          const stateClasses = getBackgroundStyle();
 
           return (
-            <div key={key} className="flex flex-col items-center gap-1">
-              <button
+            <motion.div
+              key={key}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: dayIndex * 0.01, duration: 0.2 }}
+              className="flex flex-col items-center gap-1"
+            >
+              <motion.button
                 type="button"
-                className={`${baseClasses} ${stateClasses}`}
+                whileHover={{ scale: 1.1, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                className={`${baseClasses} ${stateClasses} group`}
                 title={tooltip || undefined}
+                style={
+                  hasLeaves && !isToday
+                    ? {
+                        backgroundColor: `${primaryLeaveColor}20`,
+                        borderWidth: '2px',
+                        borderColor: primaryLeaveColor,
+                      }
+                    : undefined
+                }
               >
-                {day}
-              </button>
+                <span className="relative z-10">{day}</span>
+                {hasLeaves && !isToday && (
+                  <motion.div
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                    style={{
+                      background: `linear-gradient(135deg, ${primaryLeaveColor}40, ${primaryLeaveColor}20)`,
+                    }}
+                  />
+                )}
+              </motion.button>
               {hasLeaves ? (
                 <div className="flex items-center gap-1">
                   {entries.slice(0, 3).map((entry, entryIndex) => (
-                    <span
+                    <motion.span
                       key={`${key}-dot-${entryIndex}`}
-                      className="h-1.5 w-1.5 rounded-full"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: dayIndex * 0.01 + 0.1 + entryIndex * 0.05 }}
+                      className="h-1.5 w-1.5 rounded-full shadow-sm"
                       style={{
                         backgroundColor: entry.color ?? defaultLeaveColor,
                       }}
@@ -210,7 +269,7 @@ export function CalendarMonth({
                     />
                   ))}
                   {entries.length > 3 ? (
-                    <span className="text-[10px] text-slate-400 dark:text-slate-500">
+                    <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400">
                       +{entries.length - 3}
                     </span>
                   ) : null}
@@ -218,26 +277,38 @@ export function CalendarMonth({
               ) : (
                 <div className="h-1.5" />
               )}
-            </div>
+            </motion.div>
           );
         })}
       </div>
 
       {legend.length ? (
-        <div className="mt-4 flex flex-wrap items-center gap-4 border-t border-blue-100/60 pt-4 text-xs dark:border-slate-800/60">
-          {legend.map((item) => (
-            <div key={item.label} className="flex items-center gap-2">
-              <span
-                className="h-3 w-3 rounded"
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.4 }}
+          className="mt-4 flex flex-wrap items-center gap-4 border-t border-blue-100/60 pt-4 text-xs dark:border-slate-800/60"
+        >
+          {legend.map((item, index) => (
+            <motion.div
+              key={item.label}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.4 + index * 0.05, duration: 0.3 }}
+              className="flex items-center gap-2"
+            >
+              <motion.span
+                whileHover={{ scale: 1.2, rotate: 180 }}
+                className="h-3 w-3 rounded shadow-sm"
                 style={{ backgroundColor: item.color }}
               />
-              <span className="text-slate-600 dark:text-slate-400">
+              <span className="text-slate-600 dark:text-slate-400 font-medium">
                 {item.label}
               </span>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       ) : null}
-    </div>
+    </motion.div>
   );
 }

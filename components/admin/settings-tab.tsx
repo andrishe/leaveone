@@ -1,7 +1,8 @@
 'use client';
 
 import { ChangeEvent, useEffect, useMemo, useState } from 'react';
-import { Save } from 'lucide-react';
+import { Save, Calendar, Bell, Palette, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 type ThemeOption = 'light' | 'dark' | 'system';
 
@@ -225,29 +226,88 @@ export function SettingsTab() {
     }
   };
 
+  if (loading) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="flex items-center justify-center py-12"
+      >
+        <div className="text-center">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+            className="mx-auto mb-4 h-12 w-12 rounded-full border-4 border-blue-500 border-t-transparent"
+          />
+          <p className="text-slate-600 dark:text-slate-400">
+            Chargement des paramètres...
+          </p>
+        </div>
+      </motion.div>
+    );
+  }
+
   return (
     <div className="space-y-6">
-      {error ? (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/40 dark:bg-red-900/20 dark:text-red-300">
-          {error}
-        </div>
-      ) : null}
-      {message ? (
-        <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-900/40 dark:bg-emerald-900/20 dark:text-emerald-300">
-          {message}
-        </div>
-      ) : null}
+      <AnimatePresence mode="wait">
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+            className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/40 dark:bg-red-900/20 dark:text-red-300"
+          >
+            {error}
+          </motion.div>
+        )}
+        {message && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+            className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-900/40 dark:bg-emerald-900/20 dark:text-emerald-300"
+          >
+            {message}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800">
-        <h3 className="mb-6 text-lg font-semibold text-slate-900 dark:text-white">
-          Semaine de travail
-        </h3>
-        <p className="mb-4 text-sm text-slate-600 dark:text-slate-400">
-          Sélectionnez les jours ouvrés de votre entreprise
-        </p>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800"
+      >
+        <div className="mb-6 flex items-center gap-3">
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+            className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30"
+          >
+            <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          </motion.div>
+          <div>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+              Semaine de travail
+            </h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              Sélectionnez les jours ouvrés de votre entreprise
+            </p>
+          </div>
+        </div>
         <div className="space-y-3">
-          {workingDayOptions.map((option) => (
-            <label key={option.value} className="flex items-center gap-3">
+          {workingDayOptions.map((option, index) => (
+            <motion.label
+              key={option.value}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 + index * 0.05 }}
+              whileHover={{ x: 4 }}
+              className="flex items-center gap-3 cursor-pointer"
+            >
               <input
                 type="checkbox"
                 checked={workingDaySet.has(option.value)}
@@ -258,17 +318,43 @@ export function SettingsTab() {
               <span className="text-sm text-slate-700 dark:text-slate-300">
                 {option.label}
               </span>
-            </label>
+            </motion.label>
           ))}
         </div>
-      </div>
+      </motion.div>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800">
-        <h3 className="mb-6 text-lg font-semibold text-slate-900 dark:text-white">
-          Notifications
-        </h3>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+        className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800"
+      >
+        <div className="mb-6 flex items-center gap-3">
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.3, type: 'spring', stiffness: 200 }}
+            className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/30"
+          >
+            <Bell className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+          </motion.div>
+          <div>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+              Notifications
+            </h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              Configurez vos préférences de notifications
+            </p>
+          </div>
+        </div>
         <div className="space-y-4">
-          <label className="flex items-center justify-between">
+          <motion.label
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4 }}
+            whileHover={{ x: 4 }}
+            className="flex items-center justify-between cursor-pointer"
+          >
             <div>
               <p className="text-sm font-medium text-slate-900 dark:text-white">
                 Email pour nouvelles demandes
@@ -284,8 +370,14 @@ export function SettingsTab() {
               onChange={handleNotificationChange('newRequestEmail')}
               className="h-4 w-4 rounded text-blue-600 focus:ring-2 focus:ring-blue-500"
             />
-          </label>
-          <label className="flex items-center justify-between">
+          </motion.label>
+          <motion.label
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.45 }}
+            whileHover={{ x: 4 }}
+            className="flex items-center justify-between cursor-pointer"
+          >
             <div>
               <p className="text-sm font-medium text-slate-900 dark:text-white">
                 Rappels demandes non traitées
@@ -301,8 +393,14 @@ export function SettingsTab() {
               onChange={handleNotificationChange('pendingReminder')}
               className="h-4 w-4 rounded text-blue-600 focus:ring-2 focus:ring-blue-500"
             />
-          </label>
-          <label className="flex items-center justify-between">
+          </motion.label>
+          <motion.label
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.5 }}
+            whileHover={{ x: 4 }}
+            className="flex items-center justify-between cursor-pointer"
+          >
             <div>
               <p className="text-sm font-medium text-slate-900 dark:text-white">
                 Notifications push navigateur
@@ -318,15 +416,39 @@ export function SettingsTab() {
               onChange={handleNotificationChange('push')}
               className="h-4 w-4 rounded text-blue-600 focus:ring-2 focus:ring-blue-500"
             />
-          </label>
+          </motion.label>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800">
-        <h3 className="mb-6 text-lg font-semibold text-slate-900 dark:text-white">
-          Apparence
-        </h3>
-        <div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800"
+      >
+        <div className="mb-6 flex items-center gap-3">
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.4, type: 'spring', stiffness: 200 }}
+            className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/30"
+          >
+            <Palette className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+          </motion.div>
+          <div>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+              Apparence
+            </h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              Personnalisez le thème de l'application
+            </p>
+          </div>
+        </div>
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.5 }}
+        >
           <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
             Thème par défaut
           </label>
@@ -340,20 +462,36 @@ export function SettingsTab() {
             <option value="dark">Sombre</option>
             <option value="system">Système</option>
           </select>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
-      <div className="flex justify-end">
-        <button
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+        className="flex justify-end"
+      >
+        <motion.button
           type="button"
           onClick={handleSave}
           disabled={loading || saving}
+          whileHover={{ scale: saving ? 1 : 1.02 }}
+          whileTap={{ scale: saving ? 1 : 0.98 }}
           className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
         >
-          <Save className="h-5 w-5" />
-          {saving ? 'Enregistrement...' : 'Enregistrer les modifications'}
-        </button>
-      </div>
+          {saving ? (
+            <>
+              <Loader2 className="h-5 w-5 animate-spin" />
+              Enregistrement...
+            </>
+          ) : (
+            <>
+              <Save className="h-5 w-5" />
+              Enregistrer les modifications
+            </>
+          )}
+        </motion.button>
+      </motion.div>
     </div>
   );
 }

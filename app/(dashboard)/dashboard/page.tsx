@@ -2,7 +2,7 @@ import type {
   CalendarLegendItem,
   CalendarLeaveDTO,
 } from '@/components/calendar/calendar-month';
-import { StatCard } from '@/components/dashboard/stat-card';
+import { DashboardStats } from '@/components/dashboard/dashboard-stats';
 import { MiniCalendar } from '@/components/dashboard/mini-calendar';
 import { PendingRequests } from '@/components/dashboard/pending-requests';
 import { ApprovedLeaves } from '@/components/dashboard/approved-leaves';
@@ -103,45 +103,38 @@ export default async function DashboardPage() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-            Tableau de bord
-          </h1>
-          <p className="text-slate-600 dark:text-slate-400 mt-1">
-            Bonjour {user.name}, bienvenue sur votre espace
-          </p>
+      <div className="relative overflow-hidden rounded-2xl border border-slate-200/60 bg-linear-to-br from-blue-50 via-indigo-50/50 to-cyan-50/30 p-8 shadow-lg dark:border-slate-800/60 dark:from-slate-900/80 dark:via-slate-900/60 dark:to-slate-900/40">
+        {/* Decorative gradient orbs */}
+        <div className="absolute -right-12 -top-12 h-48 w-48 rounded-full bg-blue-400/20 blur-3xl" />
+        <div className="absolute -bottom-8 -left-8 h-40 w-40 rounded-full bg-indigo-400/20 blur-3xl" />
+
+        <div className="relative flex items-center justify-between">
+          <div>
+            <h1 className="mb-2 bg-linear-to-r from-slate-900 via-blue-900 to-indigo-900 bg-clip-text text-4xl font-bold text-transparent dark:from-white dark:via-blue-100 dark:to-indigo-100">
+              Tableau de bord
+            </h1>
+            <p className="text-lg text-slate-700 dark:text-slate-300">
+              Bonjour <span className="font-semibold text-blue-600 dark:text-blue-400">{user.name}</span>, bienvenue sur votre espace
+            </p>
+          </div>
+          <div className="hidden md:flex items-center gap-3 rounded-xl border border-blue-200/60 bg-white/60 px-4 py-3 backdrop-blur-sm dark:border-blue-900/40 dark:bg-slate-800/60">
+            <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Système actif</span>
+          </div>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatCard
-          title="Solde disponible"
-          value={totalRemaining.toFixed(1)}
-          subtitle="jours restants"
-          icon="🏖️"
-          color="bg-linear-to-br from-blue-600 via-indigo-500 to-cyan-500"
-        />
-        {user.role !== 'ADMIN' && (
-          <StatCard
-            title="Demandes en attente"
-            value={pendingCount.toString()}
-            subtitle={user.role === 'MANAGER' ? 'À valider' : 'En cours'}
-            icon="⏳"
-            color="bg-linear-to-br from-indigo-500 via-violet-500 to-blue-500"
-          />
-        )}
-        <StatCard
-          title={`Congés pris (${currentYear})`}
-          value={usedThisYear.toFixed(1)}
-          subtitle="jours utilisés"
-          icon="✅"
-          color="bg-linear-to-br from-emerald-500 via-teal-500 to-cyan-500"
-        />
-      </div>
+      <DashboardStats
+        totalRemaining={totalRemaining}
+        pendingCount={pendingCount}
+        usedThisYear={usedThisYear}
+        totalDays={balances.reduce((sum: number, b: { allocated: number }) => sum + b.allocated, 0)}
+        currentYear={currentYear}
+        userRole={user.role}
+      />
 
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

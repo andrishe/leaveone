@@ -13,6 +13,7 @@ import {
   LifeBuoy,
 } from 'lucide-react';
 import { useSession, signOut } from '@/lib/auth-client';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export type SidebarLink = {
   name: string;
@@ -108,8 +109,14 @@ export function Sidebar() {
         </div>
       </nav>
 
-      {/* Logout */}
-      <div className="p-4 border-t border-blue-100/60 dark:border-slate-700/60">
+      {/* Theme Toggle & Logout */}
+      <div className="p-4 border-t border-blue-100/60 dark:border-slate-700/60 space-y-2">
+        <div className="flex items-center justify-between px-3 py-2">
+          <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+            Thème
+          </span>
+          <ThemeToggle />
+        </div>
         <button
           onClick={handleLogout}
           className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50/80 dark:hover:bg-red-900/20 w-full transition"

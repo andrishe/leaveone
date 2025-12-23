@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getAuthenticatedContext } from '@/lib/auth-helpers';
+import { deductLeaveBalance, removePendingLeave } from '@/lib/leave-balance';
+import { sendLeaveApprovedEmail, sendLeaveRejectedEmail } from '@/lib/email';
 
 export async function POST(
   request: NextRequest,
@@ -45,6 +47,14 @@ export async function POST(
           select: {
             id: true,
             managerId: true,
+            email: true,
+            name: true,
+          },
+        },
+        leaveType: {
+          select: {
+            id: true,
+            name: true,
           },
         },
       },
@@ -73,17 +83,52 @@ export async function POST(
     }
 
     if (action === 'approve') {
-      await db.leave.update({
-        where: { id },
-        data: {
-          status: 'APPROVED',
-          approvedBy: user.id,
-          approvedAt: new Date(),
-        },
-      });
+      // Get the year from start date
+      const year = leave.startDate.getFullYear();
 
-      // TODO: Mettre à jour le solde de congés
-      // TODO: Envoyer notification à l'employé
+      try {
+        // Update leave status and deduct balance in a transaction
+        await db.$transaction(async (tx) => {
+          // Update leave status
+          await tx.leave.update({
+            where: { id },
+            data: {
+              status: 'APPROVED',
+              approvedBy: user.id,
+              approvedAt: new Date(),
+            },
+          });
+
+          // Deduct from leave balance
+          await deductLeaveBalance(
+            leave.userId,
+            leave.leaveTypeId,
+            leave.totalDays,
+            year
+          );
+        });
+
+        // Send email notification (async, don't await to avoid blocking)
+        sendLeaveApprovedEmail({
+          to: leave.user.email,
+          startDate: leave.startDate,
+          endDate: leave.endDate,
+          approverName: user.name,
+        }).catch((error) => {
+          console.error('Failed to send approval email:', error);
+          // Don't throw - email failure shouldn't fail the approval
+        });
+      } catch (error) {
+        console.error('Error approving leave:', error);
+        return NextResponse.json(
+          {
+            error: error instanceof Error
+              ? error.message
+              : 'Erreur lors de l\'approbation du congé'
+          },
+          { status: 500 }
+        );
+      }
     } else if (action === 'reject') {
       if (!reason || reason.trim().length === 0) {
         return NextResponse.json(
@@ -92,17 +137,54 @@ export async function POST(
         );
       }
 
-      await db.leave.update({
-        where: { id },
-        data: {
-          status: 'REJECTED',
-          approvedBy: user.id,
-          approvedAt: new Date(),
-          rejectedReason: reason,
-        },
-      });
+      // Get the year from start date
+      const year = leave.startDate.getFullYear();
 
-      // TODO: Envoyer notification à l'employé
+      try {
+        // Update leave status and remove pending balance in a transaction
+        await db.$transaction(async (tx) => {
+          // Update leave status
+          await tx.leave.update({
+            where: { id },
+            data: {
+              status: 'REJECTED',
+              approvedBy: user.id,
+              approvedAt: new Date(),
+              rejectedReason: reason,
+            },
+          });
+
+          // Remove pending days from balance
+          await removePendingLeave(
+            leave.userId,
+            leave.leaveTypeId,
+            leave.totalDays,
+            year
+          );
+        });
+
+        // Send email notification (async, don't await to avoid blocking)
+        sendLeaveRejectedEmail({
+          to: leave.user.email,
+          startDate: leave.startDate,
+          endDate: leave.endDate,
+          approverName: user.name,
+          reason: reason,
+        }).catch((error) => {
+          console.error('Failed to send rejection email:', error);
+          // Don't throw - email failure shouldn't fail the rejection
+        });
+      } catch (error) {
+        console.error('Error rejecting leave:', error);
+        return NextResponse.json(
+          {
+            error: error instanceof Error
+              ? error.message
+              : 'Erreur lors du refus du congé'
+          },
+          { status: 500 }
+        );
+      }
     }
 
     return NextResponse.json({ success: true });

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { calculateBusinessDays } from '@/lib/utils';
 import { getAuthenticatedContext } from '@/lib/auth-helpers';
+import { addPendingLeave } from '@/lib/leave-balance';
 
 // GET /api/leaves - Liste des congés
 export async function GET(request: NextRequest) {
@@ -197,23 +198,35 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const leave = await db.leave.create({
-      data: {
-        companyId,
-        userId,
-        leaveTypeId: leaveType.id, // <-- Correction ici
-        startDate: new Date(startDate),
-        endDate: new Date(endDate),
-        halfDayStart,
-        halfDayEnd,
-        totalDays,
-        comment,
-        documentUrl: documentUrl || null,
-        status: 'PENDING',
-      },
-      include: {
-        leaveType: true,
-      },
+    // Get the year from start date
+    const year = start.getFullYear();
+
+    // Create leave and update balance in a transaction
+    const leave = await db.$transaction(async (tx) => {
+      // Create the leave request
+      const newLeave = await tx.leave.create({
+        data: {
+          companyId,
+          userId,
+          leaveTypeId: leaveType.id,
+          startDate: new Date(startDate),
+          endDate: new Date(endDate),
+          halfDayStart,
+          halfDayEnd,
+          totalDays,
+          comment,
+          documentUrl: documentUrl || null,
+          status: 'PENDING',
+        },
+        include: {
+          leaveType: true,
+        },
+      });
+
+      // Add to pending balance
+      await addPendingLeave(userId, leaveType.id, totalDays, year);
+
+      return newLeave;
     });
 
     return NextResponse.json(leave, { status: 201 });

@@ -2,11 +2,21 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Check, Sparkles, Zap, Calendar, Brain, Shield } from 'lucide-react';
+import {
+  ArrowRight,
+  Check,
+  Sparkles,
+  Zap,
+  Calendar,
+  Brain,
+  Shield,
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function Home() {
-  const [billingCycle, setBillingCycle] = useState<'annual' | 'monthly'>('annual');
+  const [billingCycle, setBillingCycle] = useState<'annual' | 'monthly'>(
+    'annual'
+  );
   const { title, highlight, subtitle } = heroCopy;
   const displayedPlans = useMemo(() => pricingPlans, []);
 
@@ -112,7 +122,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.6 }}
-              className="mt-8 text-5xl font-bold leading-tight sm:text-6xl md:text-7xl"
+              className="mt-8 text-5xl font-bold leading-tight sm:text-6xl md:text-7xl text-slate-600 dark:text-slate-300"
             >
               {title}{' '}
               <span className="bg-gradient-to-r from-blue-600 via-indigo-500 to-cyan-400 bg-clip-text text-transparent animate-gradient">
@@ -135,7 +145,10 @@ export default function Home() {
               transition={{ delay: 0.6 }}
               className="mt-10 flex flex-wrap items-center justify-center gap-4 text-sm"
             >
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 <Link
                   href="/login"
                   className="group inline-flex items-center gap-3 rounded-full bg-gradient-to-r from-blue-600 via-indigo-500 to-cyan-500 px-8 py-4 font-semibold text-white shadow-xl shadow-blue-600/30 transition-all hover:shadow-2xl hover:shadow-blue-600/40"
@@ -144,7 +157,10 @@ export default function Home() {
                   <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </Link>
               </motion.div>
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 <Link
                   href="#pricing"
                   className="inline-flex items-center gap-3 rounded-full border-2 border-slate-200 px-8 py-4 font-semibold text-slate-600 transition-all hover:border-blue-600 hover:text-blue-600 hover:shadow-lg dark:border-slate-700 dark:text-slate-300"
@@ -281,16 +297,20 @@ export default function Home() {
               Choisissez la formule qui grandit avec votre équipe
             </h2>
             <p className="mt-4 text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-              Des tarifs transparents, résiliables à tout moment. Les intégrations et le support premium sont
-              inclus dès le plan Growth.
+              Des tarifs transparents, résiliables à tout moment. Les
+              intégrations et le support premium sont inclus dès le plan Growth.
             </p>
           </motion.div>
 
           <div className="mt-16 grid gap-8 lg:grid-cols-3">
             {displayedPlans.map((plan, i) => {
               const isPopular = plan.popular;
-              const priceLabel = billingCycle === 'annual' ? plan.annualPrice : plan.monthlyPrice;
-              const comparedPrice = billingCycle === 'annual' ? plan.monthlyPrice : null;
+              const priceLabel =
+                billingCycle === 'annual'
+                  ? plan.annualPrice
+                  : plan.monthlyPrice;
+              const comparedPrice =
+                billingCycle === 'annual' ? plan.monthlyPrice : null;
 
               return (
                 <motion.div
@@ -320,22 +340,33 @@ export default function Home() {
                   <div className="mb-6">
                     <h3
                       className={`text-2xl font-bold ${
-                        isPopular ? 'text-white' : 'text-slate-900 dark:text-white'
+                        isPopular
+                          ? 'text-white'
+                          : 'text-slate-900 dark:text-white'
                       }`}
                     >
                       {plan.name}
                     </h3>
-                    <p className={`mt-2 text-sm ${isPopular ? 'text-blue-100' : 'text-slate-500 dark:text-slate-400'}`}>
+                    <p
+                      className={`mt-2 text-sm ${isPopular ? 'text-blue-100' : 'text-slate-500 dark:text-slate-400'}`}
+                    >
                       {plan.tagline}
                     </p>
                   </div>
 
                   <div className="mb-6 flex items-baseline gap-2">
-                    <span className={`text-5xl font-bold ${isPopular ? 'text-white' : 'text-slate-900 dark:text-white'}`}>
+                    <span
+                      className={`text-5xl font-bold ${isPopular ? 'text-white' : 'text-slate-900 dark:text-white'}`}
+                    >
                       €{priceLabel}
                     </span>
-                    <span className={`text-sm ${isPopular ? 'text-blue-100' : 'text-slate-500 dark:text-slate-400'}`}>
-                      /{billingCycle === 'annual' ? 'mois (facturé annuellement)' : 'mois'}
+                    <span
+                      className={`text-sm ${isPopular ? 'text-blue-100' : 'text-slate-500 dark:text-slate-400'}`}
+                    >
+                      /
+                      {billingCycle === 'annual'
+                        ? 'mois (facturé annuellement)'
+                        : 'mois'}
                     </span>
                   </div>
 
@@ -344,7 +375,9 @@ export default function Home() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       className={`mb-6 text-xs font-semibold uppercase tracking-wide ${
-                        isPopular ? 'text-emerald-200' : 'text-emerald-600 dark:text-emerald-300'
+                        isPopular
+                          ? 'text-emerald-200'
+                          : 'text-emerald-600 dark:text-emerald-300'
                       }`}
                     >
                       {comparedPrice} €/mois en mensuel — économisez 20%
@@ -353,11 +386,15 @@ export default function Home() {
                     <div className="mb-6 h-4" />
                   )}
 
-                  <p className={`mb-8 text-sm ${isPopular ? 'text-blue-100' : 'text-slate-600 dark:text-slate-400'}`}>
+                  <p
+                    className={`mb-8 text-sm ${isPopular ? 'text-blue-100' : 'text-slate-600 dark:text-slate-400'}`}
+                  >
                     {plan.description}
                   </p>
 
-                  <ul className={`mb-8 space-y-3 text-sm ${isPopular ? 'text-blue-50' : 'text-slate-600 dark:text-slate-300'}`}>
+                  <ul
+                    className={`mb-8 space-y-3 text-sm ${isPopular ? 'text-blue-50' : 'text-slate-600 dark:text-slate-300'}`}
+                  >
                     {plan.features.map((feature, j) => (
                       <motion.li
                         key={feature}
@@ -381,7 +418,11 @@ export default function Home() {
                     ))}
                   </ul>
 
-                  <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }} className="mt-auto">
+                  <motion.div
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="mt-auto"
+                  >
                     <Link
                       href="/login"
                       className={`group inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold transition-all ${
@@ -444,7 +485,7 @@ export default function Home() {
               viewport={{ once: true }}
               className="text-4xl font-bold tracking-tight md:text-5xl"
             >
-              Simplifiez la gestion des congés dès aujourd'hui
+              Simplifiez la gestion des congés dès aujourd\'hui
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -453,8 +494,8 @@ export default function Home() {
               transition={{ delay: 0.1 }}
               className="mt-6 text-lg text-blue-100"
             >
-              Déployez LeaveOne auprès de votre équipe en moins d'une heure et offrez une expérience moderne à
-              vos collaborateurs.
+              Déployez LeaveOne auprès de votre équipe en moins d\'une heure et
+              offrez une expérience moderne à vos collaborateurs.
             </motion.p>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -463,7 +504,10 @@ export default function Home() {
               transition={{ delay: 0.2 }}
               className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center"
             >
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 <Link
                   href="/login"
                   className="group inline-flex items-center gap-3 rounded-full bg-white px-8 py-4 font-bold text-slate-900 shadow-xl transition-all hover:bg-slate-100"
@@ -503,14 +547,14 @@ const featureHighlights = [
   {
     title: 'Activation éclair',
     description:
-      "Importez vos équipes, définissez vos règles et ouvrez les demandes en moins d'une heure.",
+      "Importez vos équipes, définissez vos règles et ouvrez les demandes en moins d\'une heure.",
     icon: '⚡',
     iconComponent: <Zap className="w-6 h-6" />,
   },
   {
     title: 'Vue calendrier unifiée',
     description:
-      "Repérez instantanément les chevauchements grâce à un calendrier partagé pour toute l'entreprise.",
+      "Repérez instantanément les chevauchements grâce à un calendrier partagé pour toute l\'entreprise.",
     icon: '📅',
     iconComponent: <Calendar className="w-6 h-6" />,
   },
@@ -524,7 +568,7 @@ const featureHighlights = [
   {
     title: 'Sécurité & conformité',
     description:
-      'Infrastructure européenne, conformité RGPD et contrôles d\'accès fins pour vos managers.',
+      "Infrastructure européenne, conformité RGPD et contrôles d'accès fins pour vos managers.",
     icon: '🔐',
     iconComponent: <Shield className="w-6 h-6" />,
   },
@@ -547,12 +591,12 @@ const pricingPlans: PricingPlan[] = [
     annualPrice: 19,
     tagline: 'Pour les petites équipes et startups',
     description:
-      'L'essentiel pour digitaliser les demandes d'absence et gagner du temps sur le suivi.',
+      "L'essentiel pour digitaliser les demandes d'absence et gagner du temps sur le suivi.",
     features: [
-      'Jusqu'à 20 collaborateurs',
+      "Jusqu'à 20 collaborateurs",
       'Demandes illimitées',
       'Calendrier partagé',
-      'Workflows d'approbation simples',
+      "Workflows d'approbation simples",
       'Support par email',
     ],
   },
@@ -562,9 +606,9 @@ const pricingPlans: PricingPlan[] = [
     annualPrice: 49,
     tagline: 'Pour les PME et organisations en croissance',
     description:
-      'Centralisez l'ensemble de vos politiques de congés et offrez une expérience moderne à vos managers.',
+      "Centralisez l'ensemble de vos politiques de congés et offrez une expérience moderne à vos managers.",
     features: [
-      'Jusqu'à 100 collaborateurs',
+      "Jusqu'à 100 collaborateurs",
       'Politiques et quotas avancés',
       'Relances et rappels automatiques',
       'Exports CSV & intégrations calendriers',

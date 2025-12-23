@@ -1,6 +1,7 @@
 import { Resend } from 'resend';
 import LeaveRequestEmail from '@/emails/leave-request';
 import LeaveApprovedEmail from '@/emails/leave-approved';
+import LeaveRejectedEmail from '@/emails/leave-rejected';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const supportInbox = process.env.SUPPORT_INBOX ?? 'support@leaveone.com';
@@ -32,6 +33,21 @@ export async function sendLeaveApprovedEmail(data: {
     to: data.to,
     subject: 'Congés approuvés ✅',
     react: LeaveApprovedEmail(data),
+  });
+}
+
+export async function sendLeaveRejectedEmail(data: {
+  to: string;
+  startDate: Date;
+  endDate: Date;
+  approverName: string;
+  reason: string;
+}) {
+  await resend.emails.send({
+    from: 'LeaveOne <notifications@leaveone.com>',
+    to: data.to,
+    subject: 'Demande de congé refusée',
+    react: LeaveRejectedEmail(data),
   });
 }
 
