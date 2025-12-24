@@ -10,13 +10,16 @@ import {
   Calendar,
   Brain,
   Shield,
+  Menu,
+  X,
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Home() {
   const [billingCycle, setBillingCycle] = useState<'annual' | 'monthly'>(
     'annual'
   );
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { title, highlight, subtitle } = heroCopy;
   const displayedPlans = useMemo(() => pricingPlans, []);
 
@@ -57,18 +60,21 @@ export default function Home() {
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.6 }}
-          className="container mx-auto flex flex-wrap items-center justify-between gap-4 px-4 py-6 text-sm font-medium text-slate-600 dark:text-slate-300"
+          className="container mx-auto flex items-center justify-between px-4 py-4 md:py-6 text-sm font-medium text-slate-600 dark:text-slate-300"
         >
+          {/* Logo */}
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="flex items-center gap-2 text-base font-semibold text-slate-900 dark:text-white"
+            className="flex items-center gap-2 text-base font-semibold text-slate-900 dark:text-white z-50"
           >
-            <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 via-indigo-500 to-cyan-500 text-white font-bold shadow-lg shadow-blue-500/30">
+            <span className="inline-flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 via-indigo-500 to-cyan-500 text-white font-bold shadow-lg shadow-blue-500/30">
               L
             </span>
-            LeaveOne
+            <span className="hidden sm:inline">LeaveOne</span>
           </motion.div>
-          <nav className="flex flex-wrap items-center gap-6 text-slate-500 dark:text-slate-400">
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center gap-6 text-slate-500 dark:text-slate-400">
             {navigation.map((item, i) => (
               <motion.a
                 key={item.label}
@@ -83,11 +89,13 @@ export default function Home() {
               </motion.a>
             ))}
           </nav>
+
+          {/* Desktop CTA */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
-            className="flex items-center gap-3 text-sm"
+            className="hidden md:flex items-center gap-3 text-sm"
           >
             <Link
               href="/login"
@@ -97,6 +105,91 @@ export default function Home() {
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </motion.div>
+
+          {/* Mobile Menu Button */}
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden z-50 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            aria-label="Menu"
+          >
+            {mobileMenuOpen ? (
+              <X className="h-6 w-6 text-slate-700 dark:text-slate-300" />
+            ) : (
+              <Menu className="h-6 w-6 text-slate-700 dark:text-slate-300" />
+            )}
+          </button>
+
+          {/* Mobile Menu Overlay */}
+          <AnimatePresence>
+            {mobileMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 md:hidden"
+                onClick={() => setMobileMenuOpen(false)}
+              />
+            )}
+          </AnimatePresence>
+
+          {/* Mobile Menu Panel */}
+          <AnimatePresence>
+            {mobileMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0, x: '100%' }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: '100%' }}
+                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                className="fixed top-0 right-0 h-full w-[280px] bg-white dark:bg-slate-900 shadow-2xl z-40 md:hidden"
+              >
+                <div className="flex flex-col h-full pt-20 pb-6 px-6">
+                  {/* Mobile Navigation Links */}
+                  <nav className="flex flex-col gap-1">
+                    {navigation.map((item, i) => (
+                      <motion.a
+                        key={item.label}
+                        href={item.href}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.1 * i }}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="py-3 px-4 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors font-medium"
+                      >
+                        {item.label}
+                      </motion.a>
+                    ))}
+                  </nav>
+
+                  {/* Mobile CTA */}
+                  <div className="mt-auto pt-6 border-t border-slate-200 dark:border-slate-800">
+                    <Link
+                      href="/login"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="group flex items-center justify-center gap-2 w-full rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3 text-white font-semibold transition-all hover:shadow-lg hover:shadow-blue-500/30"
+                    >
+                      Accéder à mon espace
+                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </Link>
+                  </div>
+
+                  {/* Mobile Footer Links */}
+                  <div className="mt-6 flex flex-wrap gap-4 text-xs text-slate-500 dark:text-slate-400">
+                    <Link href="/terms" onClick={() => setMobileMenuOpen(false)} className="hover:text-blue-600">
+                      CGU
+                    </Link>
+                    <Link href="/cgv" onClick={() => setMobileMenuOpen(false)} className="hover:text-blue-600">
+                      CGV
+                    </Link>
+                    <Link href="/privacy" onClick={() => setMobileMenuOpen(false)} className="hover:text-blue-600">
+                      Confidentialité
+                    </Link>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.header>
 
         {/* Hero */}
@@ -526,6 +619,36 @@ export default function Home() {
           </div>
         </motion.div>
       </section>
+
+      {/* Footer */}
+      <footer className="border-t border-slate-200 dark:border-slate-800 mt-16">
+        <div className="container mx-auto px-4 py-12">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 via-indigo-500 to-cyan-500 text-white font-bold text-sm">
+                L
+              </span>
+              <span className="font-semibold text-slate-900 dark:text-white">LeaveOne</span>
+              <span className="text-sm ml-2">© {new Date().getFullYear()} SIMA Creation Web</span>
+            </div>
+
+            <nav className="flex flex-wrap items-center justify-center gap-6 text-sm text-slate-500 dark:text-slate-400">
+              <Link href="/terms" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                CGU
+              </Link>
+              <Link href="/cgv" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                CGV
+              </Link>
+              <Link href="/privacy" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                Confidentialité
+              </Link>
+              <a href="mailto:support@leaveone.com" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                Contact
+              </a>
+            </nav>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

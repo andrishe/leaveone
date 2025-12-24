@@ -29,7 +29,12 @@ export const auth = betterAuth({
   },
   trustedOrigins:
     process.env.NODE_ENV === 'production'
-      ? [process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000']
+      ? [
+          process.env.NEXT_PUBLIC_APP_URL,
+          process.env.NEXT_PUBLIC_VERCEL_URL
+            ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+            : null,
+        ].filter(Boolean) as string[]
       : ['http://localhost:3000'],
   advanced: {
     generateId: false, // Laisse Prisma gérer les IDs
